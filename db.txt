@@ -1,0 +1,200 @@
+USE [db_random_drug_test]
+GO
+
+/****** Object:  Table [dbo].[tblEmployee]    Script Date: 10/11/2016 4:34:42 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[tblEmployee](
+	[employee_id] [int] IDENTITY(1,1) NOT NULL,
+	[employee_code] [varchar](150) NULL,
+	[employee_first_name] [varchar](50) NULL,
+	[employee_middle_name] [varchar](3) NULL,
+	[employee_last_name] [varchar](50) NULL,
+	[employee_full_name] [varchar](150) NOT NULL,
+	[employee_position] [varchar](150) NULL,
+	[employee_office_id] [int] NOT NULL,
+	[employee_contact] [varchar](25) NULL,
+	[employee_email] [varchar](75) NULL,
+	[employee_is_active] [bit] NOT NULL CONSTRAINT [DF_tblEmployee_employee_is_active]  DEFAULT ((1)),
+ CONSTRAINT [PK_tblEmployee] PRIMARY KEY CLUSTERED 
+(
+	[employee_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+
+//* ==================================================================================
+USE [db_random_drug_test]
+GO
+
+/****** Object:  Table [dbo].[tblOffice]    Script Date: 10/11/2016 4:35:20 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[tblOffice](
+	[office_id] [bigint] IDENTITY(1,1) NOT NULL,
+	[office_code] [varchar](150) NOT NULL,
+	[office_name] [varchar](150) NOT NULL,
+	[office_is_active] [bit] NOT NULL CONSTRAINT [DF_tblOffice_office_is_active]  DEFAULT ((1)),
+ CONSTRAINT [PK_tblOffice] PRIMARY KEY CLUSTERED 
+(
+	[office_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+
+
+
+//* ==================================================================================
+USE [db_random_drug_test]
+GO
+
+/****** Object:  Table [dbo].[tblTestResults]    Script Date: 10/11/2016 4:35:43 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[tblTestResults](
+	[result_id] [int] IDENTITY(1,1) NOT NULL,
+	[result_code] [varchar](10) NOT NULL,
+	[result_employee_id] [int] NOT NULL,
+	[result_is_positive] [bit] NOT NULL,
+	[result_date] [datetime] NOT NULL,
+	[result_is_active] [bit] NOT NULL,
+ CONSTRAINT [PK_tblResults] PRIMARY KEY CLUSTERED 
+(
+	[result_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[tblTestResults] ADD  CONSTRAINT [DF_tblResults_result_is_positive]  DEFAULT ((0)) FOR [result_is_positive]
+GO
+
+ALTER TABLE [dbo].[tblTestResults] ADD  CONSTRAINT [DF_tblResults_result_date]  DEFAULT (getdate()) FOR [result_date]
+GO
+
+ALTER TABLE [dbo].[tblTestResults] ADD  CONSTRAINT [DF_tblResults_result_is_active]  DEFAULT ((1)) FOR [result_is_active]
+GO
+
+
+
+
+
+
+//* ==================================================================================
+USE [db_random_drug_test]
+GO
+
+/****** Object:  Table [dbo].[tblTestRecords]    Script Date: 10/11/2016 4:36:05 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[tblTestRecords](
+	[testRecords_event_id] [bigint] IDENTITY(1,1) NOT NULL,
+	[testRecords_event_code] [varchar](50) NULL,
+	[testRecords_batch] [int] NULL,
+	[testRecords_event_date] [datetime] NOT NULL,
+	[testRecords_covered_month] [tinyint] NULL,
+	[testRecords_covered_week] [tinyint] NULL,
+	[testRecords_covered_year] [tinyint] NULL,
+	[testRecords_employees] [text] NULL,
+	[testRecords_witnesses] [ntext] NULL,
+	[test_is_active] [bit] NULL,
+ CONSTRAINT [PK_tblTest] PRIMARY KEY CLUSTERED 
+(
+	[testRecords_event_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[tblTestRecords] ADD  CONSTRAINT [DF_tblTest_test_event_date]  DEFAULT (getdate()) FOR [testRecords_event_date]
+GO
+
+ALTER TABLE [dbo].[tblTestRecords] ADD  CONSTRAINT [DF_tblTest_test_is_active]  DEFAULT ((1)) FOR [test_is_active]
+GO
+
+
+
+
+
+
+//* ==================================================================================
+USE [db_random_drug_test]
+GO
+
+/****** Object:  Table [dbo].[tblUsers]    Script Date: 10/11/2016 4:36:20 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[tblUsers](
+	[user_id] [int] IDENTITY(1,1) NOT NULL,
+	[user_code] [varchar](10) NOT NULL,
+	[username] [varchar](50) NOT NULL,
+	[password] [varchar](50) NOT NULL,
+	[user_role] [varchar](10) NOT NULL,
+	[user_is_active] [bit] NOT NULL CONSTRAINT [DF_tblUsers_user_is_active]  DEFAULT ((1)),
+ CONSTRAINT [PK_tblUsers] PRIMARY KEY CLUSTERED 
+(
+	[user_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
