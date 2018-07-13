@@ -27,7 +27,7 @@ namespace RandomDrugTest
 
         private void FRM_NEW_EMPLOYEE_Load(object sender, EventArgs e)
         {
-            
+            int xxx = this.get_office_id("Agriculture");
             set_actions();
         }
 
@@ -334,6 +334,36 @@ namespace RandomDrugTest
 
         }
 
+
+        private int get_office_id(string office_name)
+        {
+            using (SqlConnection conConn = new SqlConnection(Global.connStr))
+            {
+                using (SqlCommand command = new SqlCommand("select office_id from tblOffice where office_name=@office_name", conConn))
+                {
+                    command.Parameters.Add("@office_name", SqlDbType.VarChar).Value = office_name;
+                    conConn.Open();
+                    SqlDataReader dr = command.ExecuteReader();
+                    if (dr.HasRows)
+                    {
+                        dr.Read();
+                        int office_id = Convert.ToInt32(dr["office_id"]);
+                    }
+                    dr.Close();
+                    conConn.Close();
+
+                    // Initialize office_id
+                    //if (ds.Tables[0].Rows.Count > 0)
+                    //{
+                    //    int office_id = Convert.ToInt32(ds.Tables["tblOffice"].Rows[0].ItemArray[0]);
+                    //    return office_id;
+                    //}
+                    return 0;
+                }
+            }
+        }
+
+
         private void backgroundWorkerProgress_DoWork(object sender, DoWorkEventArgs e)
         {
 
@@ -348,6 +378,7 @@ namespace RandomDrugTest
                     xlsConn.Open();
                     datAdapter.SelectCommand = cmd;
                     datAdapter.Fill(datSet, "[Sheet1$]");
+                    xlsConn.Close();
                     int rowCount = datSet.Tables[0].Rows.Count;
                     if (rowCount > 0)
                     {
@@ -363,8 +394,46 @@ namespace RandomDrugTest
 
                             DataRow row = datSet.Tables[0].Rows[i];
 
+                            // * ------------------------------------------
+
+                            string office_name = "";
+                            if (string.IsNullOrWhiteSpace(row.Field<string>("OFFICE")))
+                            {
+                                office_name = "N/A";
+                            }
+                            else
+                            {
+                                office_name = row.Field<string>("OFFICE").ToString();
+                            }
+                                
+                            int office_id = this.get_office_id("Agriculture");
+                         
                             using (SqlConnection conn = new SqlConnection(Global.connStr))
                             {
+
+                                
+                                //SqlCommand command = new SqlCommand("select office_id from tblOffice order by office_id asc", conn);
+                                //command.Parameters.Add("@office_name", SqlDbType.VarChar, 150).Value = office_name;
+                                //SqlDataAdapter da = new SqlDataAdapter();
+                                //da.SelectCommand = command;
+                                //DataSet ds = new DataSet();
+                                //da.Fill(ds, "tblOffice");
+
+                                //// Initialize office_id
+                                //int office_id = 0;
+                                //MessageBox.Show(ds.Tables[0].Rows.Count.ToString());
+                                //if (ds.Tables[0].Rows.Count > 0)
+                                //{
+                                //    office_id = Convert.ToInt32(ds.Tables[0].Rows[0].ItemArray[0]);
+                                //}
+
+                                // * ------------------------------------------
+
+
+
+
+
+
                                 stmt = "if not exists (select * from tblEmployee where employee_full_name=@emp_full_name_1) insert into tblEmployee (employee_full_name, employee_position, employee_office_id) values (@employee_full_name, @employee_position, @employee_office_id)";
                                 using (SqlCommand comm = new SqlCommand(stmt, conn))
                                 {
@@ -375,33 +444,7 @@ namespace RandomDrugTest
                                     comm.Parameters.Add("@employee_full_name", SqlDbType.VarChar, 120).Value = row.Field<string>("FULL NAME").ToString();
                                     comm.Parameters.Add("@employee_position", SqlDbType.VarChar, 50).Value = row.Field<string>("POSITION").ToString();
 
-                                    string office_name;
-                                    if (string.IsNullOrWhiteSpace(row.Field<string>("OFFICE")))
-                                    {
-                                        office_name = "";
-                                    }
-                                    else
-                                    {
-                                        office_name = row.Field<string>("OFFICE").ToString();
-                                    }
-
-                                    SqlCommand command = new SqlCommand("select office_id from tblOffice where office_name=@office_name", conn);
-                                    command.Parameters.Add("@office_name", SqlDbType.VarChar, 150).Value = office_name;
-                                    SqlDataAdapter da = new SqlDataAdapter();
-                                    da.SelectCommand = command;
-                                    DataSet ds = new DataSet();
-                                    da.Fill(ds, "tblOffice");
-
-                                    // Initialize office_id
-                                    int office_id;
-                                    if (ds.Tables[0].Rows.Count > 0)
-                                    {
-                                        office_id = Convert.ToInt32(ds.Tables[0].Rows[0].ItemArray[0]);
-                                    }
-                                    else
-                                    {
-                                        office_id = 0;
-                                    }
+  
 
                                     comm.Parameters.Add("@employee_office_id", SqlDbType.Int, 20).Value = Convert.ToInt32(office_id);
 
@@ -433,7 +476,7 @@ namespace RandomDrugTest
                         }
                     }
 
-                    xlsConn.Close();
+                    // xlsConn.Close();
 
                 }
             }

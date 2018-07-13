@@ -15,6 +15,7 @@ namespace RandomDrugTest
     {
         //variables
         private int dataCount;
+        private String existingGeneratedEmployees = "";
 
         public FRM_RANDOMIZER()
         {
@@ -32,9 +33,7 @@ namespace RandomDrugTest
         {
             pbPreloader.Visible = true;
             tmrPreloader.Start();
-            ///generate_all();
-            
-
+            //generate_all();
         }
 
         // Generate Datagridview
@@ -63,16 +62,64 @@ namespace RandomDrugTest
             
         }
 
+        // Get datas of the already generated
+        public void get_generated_records()
+        {
+            using (SqlConnection conn = new SqlConnection(Global.connStr))
+            {
+                string stmt = "select testRecords_employees as employees from tblTestRecords where test_is_active=1";
+                using (SqlCommand cmd = new SqlCommand(stmt, conn))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter();
+                    DataSet ds = new DataSet();
+                    conn.Open();
+                    da.SelectCommand = cmd;
+                    da.Fill(ds, "tblTestRecords");
+                    int len = ds.Tables[0].Rows.Count;
+                    
+                    for (int i = 0; i < len; i++)
+                    {
+                        this.existingGeneratedEmployees += ds.Tables[0].Rows[i].Field<String>("employees");
+                    }
+                    conn.Close();
+
+                    // Dispose All Resources
+                    //conn.Dispose();
+                    cmd.Dispose();
+                    da.Dispose();
+                    ds.Dispose();
+                }
+            }
+        }
+
+        // TEST GENERATE
+        public void test_generate() {
+            String stmt = "select * from tblEmployees where employee_id in (";
+            String stringTest = "1:2:3:4:5";
+            String[] nameSplit = stringTest.Split(':');
+            for (int i = 0; i < nameSplit.Length; i++) {
+                if (i == nameSplit.Length - 1) {
+                    stmt += "" + nameSplit[i] + "";
+                } else {
+                    stmt += "" + nameSplit[i] + ", ";
+                }
+            }
+            stmt += ")";
+        }
+
+        // Generate all Method
         public void generate_all(int personToTest = 0) {
 
             string[] args = new string[] { };
 
-            int[] ref_restrict = new int[6];
+            int[] ref_restrict = new int[8];
 
+
+            // 1. Initialize Restrictions
             using (SqlConnection conn = new SqlConnection(Global.connStr))
             {
 
-                string[] restrict = new string[] { "SANGGUNIANG PANLALAWIGAN (SECRETARIAT)", "SANGGUNIANG PANLALAWIGAN OFFICE (Legislation)", "VICE GOVERNOR' S OFFICE", "GOVERNOR'S OFFICE", "PROVINCIAL LEARNING AND RESOURCE CENTER", "OFFICE OF THE GOVERNOR" };
+                string[] restrict = new string[] { "SANGGUNIANG PANLALAWIGAN (SECRETARIAT)", "SANGGUNIANG PANLALAWIGAN OFFICE (Legislation)", "VICE GOVERNOR' S OFFICE", "GOVERNOR'S OFFICE", "PROVINCIAL LEARNING AND RESOURCE CENTER", "OFFICE OF THE GOVERNOR", "GO", "GO DRI/SEC" };
 
                 for (int i = 0; i < restrict.Length; i++)
                 {
@@ -101,10 +148,27 @@ namespace RandomDrugTest
                 }
             }
 
+            // Set the number of persons subject for generating
             int personCount = 0;
             using (SqlConnection conn = new SqlConnection(Global.connStr))
             {
-                string stmt = "select count(employee_id) as emp_count from tblEmployee where employee_office_id!=@name_1 and employee_office_id!=@name_2 and employee_office_id!=@name_3 and employee_office_id!=@name_4 and employee_office_id!=@name_5 and employee_office_id!=@name_6";
+                string stmt = "select count(employee_id) as emp_count from tblEmployee where ";
+                String[] nameSplit = this.existingGeneratedEmployees.Split(':');
+                int lenName = nameSplit.Length;
+                
+                if (lenName > 0 && nameSplit[0] != "") {
+                    stmt += "employee_id not in (";
+                    for (int i = 0; i < lenName; i++) {
+                        if (i == nameSplit.Length - 1) {
+                            stmt += "" + nameSplit[i] + "";
+                        } else {
+                            stmt += "" + nameSplit[i] + ", ";
+                        }
+                    }
+                    stmt += ") and ";
+                }
+                
+                stmt += "employee_office_id!=@name_1 and employee_office_id!=@name_2 and employee_office_id!=@name_3 and employee_office_id!=@name_4 and employee_office_id!=@name_5 and employee_office_id!=@name_6";
                 using (SqlCommand comm = new SqlCommand(stmt, conn))
                 {
 
@@ -132,6 +196,7 @@ namespace RandomDrugTest
                 }
             }
 
+            // Generate Now
             if (personToTest <= personCount)
             {
                 string[] headerNames = new string[] { "ID", "FULL NAME", "POSITION", "OFFICE" };
@@ -143,7 +208,22 @@ namespace RandomDrugTest
                 {
                     using (SqlConnection conn = new SqlConnection(Global.connStr))
                     {
-                        string stmt = "select tblEmployee.employee_id, tblEmployee.employee_full_name, tblEmployee.employee_position, tblOffice.office_name from tblEmployee left join tblOffice on tblEmployee.employee_office_id=tblOffice.office_id where tblEmployee.employee_office_id!=@name_1 and tblEmployee.employee_office_id!=@name_2 and tblEmployee.employee_office_id!=@name_3 and tblEmployee.employee_office_id!=@name_4 and tblEmployee.employee_office_id!=@name_5 and tblEmployee.employee_office_id!=@name_6";
+                        string stmt = "select tblEmployee.employee_id, tblEmployee.employee_full_name, tblEmployee.employee_position, tblOffice.office_name from tblEmployee left join tblOffice on tblEmployee.employee_office_id=tblOffice.office_id where ";
+                        String[] nameSplit = this.existingGeneratedEmployees.Split(':');
+                        int lenName = nameSplit.Length;
+                        if (lenName > 0 && nameSplit[0] != "") {
+                            stmt += "tblEmployee.employee_id not in (";
+                            for (int x = 0; x < nameSplit.Length; x++) {
+                                if (x == nameSplit.Length - 1) {
+                                    stmt += "" + nameSplit[x] + "";
+                                } else {
+                                    stmt += "" + nameSplit[x] + ", ";
+                                }
+                            }
+                            stmt += ") and ";
+                        }
+                        
+                        stmt += "tblEmployee.employee_office_id!=@name_1 and tblEmployee.employee_office_id!=@name_2 and tblEmployee.employee_office_id!=@name_3 and tblEmployee.employee_office_id!=@name_4 and tblEmployee.employee_office_id!=@name_5 and tblEmployee.employee_office_id!=@name_6";
                         using (SqlCommand comm = new SqlCommand(stmt, conn))
                         {
                             for (int x = 0; x < ref_restrict.Length; x++)
@@ -298,8 +378,12 @@ namespace RandomDrugTest
         {
             tmrPreloader.Stop();
             pbPreloader.Visible = false;
+            
+            // Comment next line for testing
             generate_all(Convert.ToInt32(this.toolStripTxtNumberofPersons.Text));
         }
+
+        
 
         /*
          * Save To Database 
@@ -343,6 +427,8 @@ namespace RandomDrugTest
                     comm.Parameters.Add("@testRecords_witnesses", SqlDbType.VarChar).Value = Global.testWintesses;
                     comm.Parameters.Add("@testRecords_generated_by", SqlDbType.VarChar).Value = Global.testGeneratedBy;
                     conn.Open();
+                    
+                    
                     comm.ExecuteNonQuery();
                     conn.Close();
 

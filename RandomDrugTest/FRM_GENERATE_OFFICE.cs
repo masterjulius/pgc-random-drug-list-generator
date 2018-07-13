@@ -25,7 +25,7 @@ namespace RandomDrugTest
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string conX = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\IT Development\Projects\RandomDrugTest_20161012_0912\final.xls;Extended Properties=Excel 12.0;";
+            string conX = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\IT-Development\Files\__PROJECTS__\PGC-random-drug-test\executive\pgc-random-drug-list-generator\final.xls;Extended Properties=Excel 12.0;";
             using (OleDbConnection conn = new OleDbConnection(conX))
             {
                 string stmt = "select distinct office from [Sheet1$]";

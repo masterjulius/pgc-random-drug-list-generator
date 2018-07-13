@@ -111,6 +111,12 @@
     <Compile Include="FRM_GENERATOR.Designer.cs">
       <DependentUpon>FRM_GENERATOR.cs</DependentUpon>
     </Compile>
+    <Compile Include="FRM_HISTORY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM_HISTORY.Designer.cs">
+      <DependentUpon>FRM_HISTORY.cs</DependentUpon>
+    </Compile>
     <Compile Include="FRM_HOWMANY.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +190,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FRM_GENERATOR.resx">
       <DependentUpon>FRM_GENERATOR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM_HISTORY.resx">
+      <DependentUpon>FRM_HISTORY.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FRM_HOWMANY.resx">
       <DependentUpon>FRM_HOWMANY.cs</DependentUpon>

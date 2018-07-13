@@ -29,8 +29,8 @@ namespace RandomDrugTest
             this.FormBorderStyle = FormBorderStyle.None;
             tmrPreload.Start();
 
-
             frmNext = new FRM_RANDOMIZER();
+            frmNext.get_generated_records();
             frmNext.generate_all(Global.personToGenerateCout);
 
         }
